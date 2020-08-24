@@ -2,19 +2,19 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-class UNet3D_ACDC(nn.Module):
+class UNet3D(nn.Module):
     def __init__(
         self,
-        in_channels=1,
-        n_classes=2,
+        in_channels=3,
+        n_classes=4,
         depth=5,
-        base_n_filters = 26,
+        base_n_filters = 0,
         padding=True,
         batch_norm=True,
         dropout=0,
         up_mode='upsample',
     ):
-        super(UNet3D_ACDC, self).__init__()
+        super(UNet3D, self).__init__()
         assert up_mode in ('upconv', 'upsample')
         self.padding = padding
         self.depth = depth
@@ -55,7 +55,6 @@ class UNet3D_ACDC(nn.Module):
             if i != len(self.down_path) - 1:
                 blocks.append(x)
                 x = F.max_pool3d(x, (2,2,1))
-
         for i, up in enumerate(self.up_path):
             x = up(x, blocks[-i - 1])
             blocks_up.append(x)
@@ -146,5 +145,5 @@ class UNetUpBlock(nn.Module):
         return out
 
 if __name__ == "__main__":
-    unet = UNet3D_ACDC(padding=True, batch_norm=True)
+    unet = UNet3D(padding=True, batch_norm=True)
     print(unet)
